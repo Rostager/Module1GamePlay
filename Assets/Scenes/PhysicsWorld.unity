@@ -959,6 +959,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2380639918912680015, guid: 40fe04d4104e7844886597892ada3815, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 919903568}
+    - target: {fileID: 2380639918912680015, guid: 40fe04d4104e7844886597892ada3815, type: 3}
       propertyPath: firstShotDelay
       value: 1
       objectReference: {fileID: 0}
@@ -1294,6 +1298,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2380639918912680015, guid: 40fe04d4104e7844886597892ada3815, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 919903568}
     - target: {fileID: 2380639918912680015, guid: 40fe04d4104e7844886597892ada3815, type: 3}
       propertyPath: playerAimPoint
       value: 
