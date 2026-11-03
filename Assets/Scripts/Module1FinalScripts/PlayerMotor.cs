@@ -20,6 +20,12 @@ public sealed class PlayerMotor : MonoBehaviour
     [Header("Jump Settings")]
     [SerializeField] private float jumpHeight = 2f;
 
+    [Header("Air Movement")]
+    [SerializeField] private float airStrafeSpeed = 2f;
+    [SerializeField] private float airAcceleration = 30f;
+    [SerializeField] private float airForwardAcceleration = 2f;
+    [SerializeField] private float maxMovementSpeed = 18f;
+
     private Rigidbody body;
 
     public bool IsGrounded { get; private set; }
@@ -31,7 +37,9 @@ public sealed class PlayerMotor : MonoBehaviour
 
     public void CheckGround()
     {
-        IsGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayers, QueryTriggerInteraction.Ignore);
+        bool touchingGround = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayers, QueryTriggerInteraction.Ignore);
+
+        IsGrounded = touchingGround && body.linearVelocity.y <= 0.1f;
     }
 
     public void MoveOnGround(Vector2 moveInput)
@@ -105,5 +113,52 @@ public sealed class PlayerMotor : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    public void Jump()
+    {
+        Vector3 velocity = body.linearVelocity;
+        float jumpSpeed = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * jumpHeight);
+
+        body.linearVelocity = new Vector3(velocity.x, jumpSpeed, velocity.z);
+        IsGrounded = false;
+    }
+
+
+
+    public void MoveInAir(Vector2 moveInput)
+    {
+        Vector3 velocityBefore = body.linearVelocity;
+        Vector3 horizontalBefore = new Vector3(velocityBefore.x, 0f, velocityBefore.z);
+
+        Vector3 strafeDirection = GetMoveDirection(new Vector2(moveInput.x, 0f));
+        float strafeSpeed = airStrafeSpeed * Mathf.Abs(moveInput.x);
+
+        Accelerate(strafeDirection, strafeSpeed, airAcceleration);
+
+        if (Mathf.Abs(moveInput.y) > 0f)
+        {
+            Vector3 moveDirection = GetMoveDirection(new Vector2(0f, moveInput.y));
+            float targetSpeed = groundSpeed * Mathf.Abs(moveInput.y);
+
+            Accelerate(moveDirection, targetSpeed, airForwardAcceleration);
+        }
+
+        LimitAirSpeed(horizontalBefore.magnitude);
+    }
+
+
+
+
+    private void LimitAirSpeed(float previousSpeed)
+    {
+        Vector3 velocity = body.linearVelocity;
+        Vector3 horizontalVelocity = new Vector3(velocity.x, 0f, velocity.z);
+
+        float allowedSpeed = Mathf.Max(maxMovementSpeed, previousSpeed);
+
+        horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, allowedSpeed);
+
+        body.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
     }
 }

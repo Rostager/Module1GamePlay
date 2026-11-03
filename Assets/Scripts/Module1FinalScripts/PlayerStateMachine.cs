@@ -12,8 +12,14 @@ public sealed class PlayerStateMachine : MonoBehaviour
     [SerializeField] private PlayerInputReader input;
     [SerializeField] private PlayerMotor motor;
 
+    [Header("Jump Timing")]
+    [SerializeField] private float jumpBufferTime = 0.12f;
+    [SerializeField] private float coyoteTime = 0.1f;
+
     [Header("Debug")]
     [SerializeField] private MovementState currentState = MovementState.Airborne;
+
+    private float lastGroundedTime = float.NegativeInfinity;
 
     public MovementState CurrentState => currentState;
 
@@ -22,6 +28,13 @@ public sealed class PlayerStateMachine : MonoBehaviour
         motor.CheckGround();
         UpdateState();
 
+        if (currentState == MovementState.Grounded)
+        {
+            lastGroundedTime = Time.time;
+        }
+
+        TryJump();
+
         switch (currentState)
         {
             case MovementState.Grounded:
@@ -29,7 +42,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
                 break;
 
             case MovementState.Airborne:
-                // Gravity handles falling until we add air movement.
+                motor.MoveInAir(input.MoveInput);
                 break;
         }
     }
@@ -44,5 +57,26 @@ public sealed class PlayerStateMachine : MonoBehaviour
         {
             currentState = MovementState.Airborne;
         }
+    }
+
+    private void TryJump()
+    {
+        bool hasBufferedPress = Time.time - input.LastJumpPressedTime <= jumpBufferTime;
+        bool withinCoyoteTime = Time.time - lastGroundedTime <= coyoteTime;
+        bool grounded = currentState == MovementState.Grounded;
+
+        bool canJump = grounded || withinCoyoteTime;
+        bool wantsJump = hasBufferedPress || (grounded && input.JumpHeld);
+
+        if (!canJump || !wantsJump)
+        {
+            return;
+        }
+
+        motor.Jump();
+        input.ConsumeJumpPress();
+
+        lastGroundedTime = float.NegativeInfinity;
+        currentState = MovementState.Airborne;
     }
 }
