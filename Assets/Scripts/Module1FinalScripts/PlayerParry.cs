@@ -41,6 +41,11 @@ public sealed class PlayerParry : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f)
+        {
+            return;
+        }
+
         UpdateTimer();
 
         if (currentState == ParryState.Ready && input.ParryPressed)

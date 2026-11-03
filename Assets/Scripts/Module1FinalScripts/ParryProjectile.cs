@@ -68,6 +68,15 @@ public sealed class ParryProjectile : MonoBehaviour
                 enemyHealth.TakeDamage(1);
             }
         }
+        else
+        {
+            PlayerHealth playerHealth = collision.collider.GetComponentInParent<PlayerHealth>();
+
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(1);
+            }
+        }
 
         Destroy(gameObject);
     }

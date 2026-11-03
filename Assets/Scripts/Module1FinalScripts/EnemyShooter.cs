@@ -21,6 +21,11 @@ public sealed class EnemyShooter : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f)
+        {
+            return;
+        }
+
         if (target == null)
         {
             return;
@@ -49,4 +54,14 @@ public sealed class EnemyShooter : MonoBehaviour
         ParryProjectile projectile = Instantiate(projectilePrefab, firePoint.position, rotation);
         projectile.SetShooter(enemyCollider);
     }
+
+
+
+    public void Initialize(Transform newTarget, float firingInterval)
+    {
+        target = newTarget;
+        shotInterval = Mathf.Max(firingInterval, 0.1f);
+        shotTimer = initialDelay;
+    }
+
 }

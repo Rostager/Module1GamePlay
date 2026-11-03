@@ -98,4 +98,10 @@ public sealed class EnemyOrbitMovement : MonoBehaviour
 
         body.MovePosition(nextPosition);
     }
+
+
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+    }
 }

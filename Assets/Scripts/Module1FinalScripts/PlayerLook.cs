@@ -7,7 +7,6 @@ public sealed class PlayerLook : MonoBehaviour
     [SerializeField] private Transform cameraPivot;
 
     [Header("Look Settings")]
-    [SerializeField, Min(0f)] private float mouseSensitivity = 0.1f;
     [SerializeField, Range(1f, 89f)] private float pitchLimit = 85f;
 
     private float yaw;
@@ -15,6 +14,11 @@ public sealed class PlayerLook : MonoBehaviour
 
     private void Update()
     {
+        if (Time.timeScale == 0f)
+        {
+            return;
+        }
+
         if (Cursor.lockState != CursorLockMode.Locked)
         {
             return;
@@ -22,8 +26,8 @@ public sealed class PlayerLook : MonoBehaviour
 
         Vector2 lookInput = input.LookInput;
 
-        yaw += lookInput.x * mouseSensitivity;
-        pitch -= lookInput.y * mouseSensitivity;
+        yaw += lookInput.x * GameSettings.MouseSensitivity;
+        pitch -= lookInput.y * GameSettings.MouseSensitivity;
 
         yaw = Mathf.Repeat(yaw, 360f);
         pitch = Mathf.Clamp(pitch, -pitchLimit, pitchLimit);
